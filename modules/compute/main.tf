@@ -14,6 +14,7 @@ resource "docker_container" "this" {
   user          = "101"
   read_only     = true
   memory        = var.memory_mb
+  memory_swap   = 256
   security_opts = ["no-new-privileges:true"]
   restart       = "unless-stopped"
 
