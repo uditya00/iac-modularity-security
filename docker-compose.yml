@@ -1,0 +1,21 @@
+services:
+  tfstate-db:
+    image: postgres:16-alpine
+    container_name: tfstate-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: tfstate
+      POSTGRES_DB: tfstate
+      POSTGRES_PASSWORD: "${TFSTATE_DB_PASSWORD:?run scripts/env first}"
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - tfstate-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tfstate -d tfstate"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  tfstate-data:
