@@ -15,3 +15,9 @@ variable "host_port" {
   type        = number
   default     = 8080
 }
+
+variable "kubernetes_namespace" {
+  description = "Kubernetes namespace for the StratoMesh platform."
+  type        = string
+  default     = "stratomesh"
+}

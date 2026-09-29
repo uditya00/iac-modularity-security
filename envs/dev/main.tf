@@ -19,3 +19,8 @@ module "compute" {
   volume_name  = module.storage.volume_name
   host_port    = var.host_port
 }
+
+module "kubernetes" {
+  source    = "../../modules/kubernetes"
+  namespace = var.kubernetes_namespace
+}
