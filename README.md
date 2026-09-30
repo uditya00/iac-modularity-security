@@ -221,7 +221,7 @@ iac-modularity-security
 Branch:
 
 ```text
-stratomesh-upgrade
+main
 ```
 
 Argo CD uses automated sync, self-healing, and pruning.
