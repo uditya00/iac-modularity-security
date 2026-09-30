@@ -1,0 +1,93 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: stratomesh-db-pvc
+  namespace: stratomesh
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stratomesh-db
+  namespace: stratomesh
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stratomesh-db
+  template:
+    metadata:
+      labels:
+        app: stratomesh-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - secretRef:
+                name: stratomesh-db-secret
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+            - name: init-script
+              mountPath: /docker-entrypoint-initdb.d/init.sql
+              subPath: init.sql
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+            initialDelaySeconds: 15
+            periodSeconds: 10
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: stratomesh-db-pvc
+        - name: init-script
+          configMap:
+            name: stratomesh-db-init
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: stratomesh-db-init
+  namespace: stratomesh
+data:
+  init.sql: |
+    CREATE TABLE IF NOT EXISTS app_status (
+        id SERIAL PRIMARY KEY,
+        message TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    INSERT INTO app_status (message)
+    VALUES ('StratoMesh database is working');
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stratomesh-db
+  namespace: stratomesh
+spec:
+  selector:
+    app: stratomesh-db
+  ports:
+    - port: 5432
+      targetPort: 5432
+  type: ClusterIP

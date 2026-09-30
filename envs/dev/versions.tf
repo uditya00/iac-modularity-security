@@ -6,6 +6,11 @@ terraform {
       source  = "kreuzwerker/docker"
       version = "~> 3.0"
     }
+
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.38"
+    }
   }
 
   # Remote state in PostgreSQL. Postgres locks the state automatically.
