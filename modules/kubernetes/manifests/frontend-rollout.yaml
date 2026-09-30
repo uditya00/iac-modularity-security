@@ -1,0 +1,65 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: stratomesh-frontend
+  namespace: stratomesh
+spec:
+  replicas: 2
+  revisionHistoryLimit: 3
+
+  selector:
+    matchLabels:
+      app: stratomesh-frontend
+
+  template:
+    metadata:
+      labels:
+        app: stratomesh-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: stratomesh-frontend:1.0
+          imagePullPolicy: IfNotPresent
+
+          env:
+            - name: BACKEND_URL
+              value: http://stratomesh-backend:3000
+
+          ports:
+            - containerPort: 8080
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 15
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+
+  strategy:
+    canary:
+      stableService: stratomesh-frontend
+      canaryService: stratomesh-frontend-canary
+
+      steps:
+        - setWeight: 20
+        - pause:
+            duration: 30s
+        - setWeight: 50
+        - pause:
+            duration: 30s
+        - setWeight: 100
