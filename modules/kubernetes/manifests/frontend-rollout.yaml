@@ -6,11 +6,9 @@ metadata:
 spec:
   replicas: 2
   revisionHistoryLimit: 3
-
   selector:
     matchLabels:
       app: stratomesh-frontend
-
   template:
     metadata:
       labels:
@@ -20,28 +18,23 @@ spec:
         - name: frontend
           image: stratomesh-frontend:1.1
           imagePullPolicy: IfNotPresent
-
           env:
             - name: BACKEND_URL
               value: http://stratomesh-backend:3000
-
           ports:
             - containerPort: 8080
-
           readinessProbe:
             httpGet:
               path: /health
               port: 8080
             initialDelaySeconds: 5
             periodSeconds: 10
-
           livenessProbe:
             httpGet:
               path: /health
               port: 8080
             initialDelaySeconds: 10
             periodSeconds: 15
-
           resources:
             requests:
               cpu: 100m
@@ -49,16 +42,15 @@ spec:
             limits:
               cpu: 500m
               memory: 256Mi
-
   strategy:
     canary:
       stableService: stratomesh-frontend
       canaryService: stratomesh-frontend-canary
-
       steps:
         - setWeight: 20
-        - pause: {}
+        - analysis:
+            templates:
+              - templateName: frontend-canary-health
         - setWeight: 50
         - pause: {}
         - setWeight: 100
-
