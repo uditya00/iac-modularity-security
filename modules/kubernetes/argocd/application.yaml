@@ -3,18 +3,31 @@ kind: Application
 metadata:
   name: stratomesh
   namespace: argocd
+
 spec:
   project: default
+
   source:
     repoURL: https://github.com/uditya00/iac-modularity-security.git
     targetRevision: stratomesh-upgrade
     path: modules/kubernetes/manifests
+
   destination:
     server: https://kubernetes.default.svc
     namespace: stratomesh
+
+  ignoreDifferences:
+    - group: argoproj.io
+      kind: Rollout
+      name: stratomesh-frontend
+      jsonPointers:
+        - /spec/replicas
+
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
+
     syncOptions:
       - CreateNamespace=true
+      - RespectIgnoreDifferences=true
