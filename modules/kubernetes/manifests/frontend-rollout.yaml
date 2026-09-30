@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: stratomesh-frontend:1.0
+          image: stratomesh-frontend:1.1
           imagePullPolicy: IfNotPresent
 
           env:
@@ -57,9 +57,8 @@ spec:
 
       steps:
         - setWeight: 20
-        - pause:
-            duration: 30s
+        - pause: {}
         - setWeight: 50
-        - pause:
-            duration: 30s
+        - pause: {}
         - setWeight: 100
+
