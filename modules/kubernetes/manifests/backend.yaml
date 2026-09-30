@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: stratomesh-backend-config
+  namespace: stratomesh
+data:
+  DB_HOST: "stratomesh-db"
+  DB_PORT: "5432"
+  DB_NAME: "stratomesh"
+  DB_USER: "stratomesh"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stratomesh-backend
+  namespace: stratomesh
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: stratomesh-backend
+  template:
+    metadata:
+      labels:
+        app: stratomesh-backend
+    spec:
+      containers:
+        - name: backend
+          image: stratomesh-backend:1.0
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - containerPort: 3000
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+
+          envFrom:
+            - configMapRef:
+                name: stratomesh-backend-config
+
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: stratomesh-db-secret
+                  key: POSTGRES_PASSWORD
+
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 15
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stratomesh-backend
+  namespace: stratomesh
+spec:
+  type: ClusterIP
+  selector:
+    app: stratomesh-backend
+  ports:
+    - port: 3000
+      targetPort: 3000

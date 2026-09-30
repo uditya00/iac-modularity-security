@@ -1,0 +1,22 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: stratomesh-backend-pdb
+  namespace: stratomesh
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: stratomesh-backend
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: stratomesh-frontend-pdb
+  namespace: stratomesh
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: stratomesh-frontend
