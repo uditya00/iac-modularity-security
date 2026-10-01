@@ -66,7 +66,7 @@ app.get("/", async (req, res) => {
       <div class="container">
         <h1>StratoMesh Platform</h1><p><strong>CANARY v1.1</strong></p>
 
-        <p>Multi-Region GitOps & Self-Healing Cloud Platform</p>
+        <p>GitOps & Self-Healing Cloud Platform</p>
 
         <div class="status">
           Frontend:

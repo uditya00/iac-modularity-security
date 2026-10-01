@@ -1,4 +1,4 @@
-# StratoMesh — Multi-Region GitOps & Self-Healing Cloud Platform
+# StratoMesh — GitOps & Self-Healing Cloud Platform
 
 A local-first implementation of a secure, modular Infrastructure-as-Code and GitOps platform using Terraform, Kubernetes, Argo CD, Argo Rollouts, Prometheus, Grafana, Traefik, and cert-manager.
 
@@ -73,7 +73,7 @@ Terraform State: PostgreSQL remote backend
 ## Repository Structure
 
 ```text
-iac-free/
+inframesh/
 ├── .github/workflows/terraform-ci.yml
 ├── envs/dev/
 │   ├── main.tf
@@ -253,7 +253,7 @@ The health analysis checks frontend pod readiness through Prometheus.
 
 ### Canary Limitation
 
-The current local implementation uses replica-based canary weighting. With a small number of replicas, the actual request distribution may not exactly equal the configured percentage. Production traffic splitting would be more precise with ingress or service-mesh traffic routing.
+The current local implementation uses replica-based canary weighting rather than exact HTTP traffic splitting. With a small number of replicas, the actual request distribution may not exactly match the configured percentage. The Prometheus analysis checks frontend pod readiness, not application error rate. Production deployments can use ingress or service-mesh traffic routing with application-level metrics for precise traffic splitting and error-based promotion or rollback.
 
 ## Ingress
 
@@ -270,7 +270,6 @@ HTTPS -> localhost:8443
 
 cert-manager is installed and includes:
 
-- Let's Encrypt staging ClusterIssuer
 - Self-signed ClusterIssuer
 - Kubernetes TLS Certificate
 

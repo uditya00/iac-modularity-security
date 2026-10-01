@@ -11,7 +11,7 @@ const pool = new Pool({
   port: Number(process.env.DB_PORT || 5432),
   database: process.env.DB_NAME || "stratomesh",
   user: process.env.DB_USER || "stratomesh",
-  password: process.env.DB_PASSWORD || "change-me"
+  password: process.env.DB_PASSWORD
 });
 
 app.get("/", (req, res) => {

@@ -9,7 +9,7 @@ spec:
 
   source:
     repoURL: https://github.com/uditya00/iac-modularity-security.git
-    targetRevision: stratomesh-upgrade
+    targetRevision: main
     path: modules/kubernetes/manifests
 
   destination:
