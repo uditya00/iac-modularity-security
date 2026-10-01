@@ -1,7 +1,7 @@
 variable "project_name" {
   description = "Short project name used in resource names."
   type        = string
-  default     = "iacdemo"
+  default     = "inframesh"
 }
 
 variable "environment" {

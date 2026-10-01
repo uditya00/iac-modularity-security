@@ -8,7 +8,7 @@ spec:
   project: default
 
   source:
-    repoURL: https://github.com/uditya00/iac-modularity-security.git
+    repoURL: https://github.com/uditya00/inframesh.git
     targetRevision: main
     path: modules/kubernetes/manifests
 
