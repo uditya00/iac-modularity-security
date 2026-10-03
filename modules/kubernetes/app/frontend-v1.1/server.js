@@ -1,8 +1,40 @@
 const express = require("express");
+const client = require("prom-client");
 
 const app = express();
 const port = process.env.PORT || 8080;
 const backendUrl = process.env.BACKEND_URL || "http://stratomesh-backend:3000";
+
+// Prometheus metrics
+const register = new client.Registry();
+client.collectDefaultMetrics({ register });
+
+const httpRequests = new client.Counter({
+  name: "frontend_http_requests_total",
+  help: "Total number of HTTP requests received by the frontend",
+  labelNames: ["method", "route", "status_code"],
+});
+
+register.registerMetric(httpRequests);
+
+// Count HTTP responses
+app.use((req, res, next) => {
+  res.on("finish", () => {
+    httpRequests.inc({
+      method: req.method,
+      route: req.path,
+      status_code: res.statusCode,
+    });
+  });
+
+  next();
+});
+
+// Prometheus metrics endpoint
+app.get("/metrics", async (req, res) => {
+  res.set("Content-Type", register.contentType);
+  res.end(await register.metrics());
+});
 
 app.get("/", async (req, res) => {
   let backendStatus = "unavailable";
@@ -10,11 +42,13 @@ app.get("/", async (req, res) => {
 
   try {
     const healthResponse = await fetch(`${backendUrl}/health`);
+
     if (healthResponse.ok) {
       backendStatus = "healthy";
     }
 
     const readyResponse = await fetch(`${backendUrl}/ready`);
+
     if (readyResponse.ok) {
       const data = await readyResponse.json();
       databaseStatus = data.database || "connected";
@@ -64,7 +98,9 @@ app.get("/", async (req, res) => {
 
     <body>
       <div class="container">
-        <h1>StratoMesh Platform</h1><p><strong>CANARY v1.1</strong></p>
+        <h1>StratoMesh Platform</h1>
+
+        <p><strong>CANARY v1.1</strong></p>
 
         <p>GitOps & Self-Healing Cloud Platform</p>
 
@@ -95,6 +131,5 @@ app.get("/health", (req, res) => {
 });
 
 app.listen(port, "0.0.0.0", () => {
-  console.log(`StratoMesh frontend listening on port ${port}`);
+  console.log(`StratoMesh frontend canary v1.1 listening on port ${port}`);
 });
-
