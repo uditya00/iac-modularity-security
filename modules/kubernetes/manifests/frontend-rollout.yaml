@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: stratomesh-frontend:1.1
+          image: stratomesh-frontend:1.1-metrics
           imagePullPolicy: IfNotPresent
           env:
             - name: BACKEND_URL
