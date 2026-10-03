@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: frontend-canary-error-rate
+  namespace: stratomesh
+spec:
+  metrics:
+    - name: canary-http-error-rate
+      interval: 30s
+      count: 3
+      failureLimit: 1
+      provider:
+        prometheus:
+          address: http://monitoring-kube-prometheus-prometheus.monitoring.svc:9090
+          query: |
+            100 *
+            sum(rate(frontend_http_requests_total{service="stratomesh-frontend-canary",status_code=~"5.."}[1m]))
+            /
+            clamp_min(
+              sum(rate(frontend_http_requests_total{service="stratomesh-frontend-canary"}[1m])),
+              1
+            )
+      successCondition: result[0] < 1

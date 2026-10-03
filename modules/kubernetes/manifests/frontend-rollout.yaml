@@ -50,7 +50,7 @@ spec:
         - setWeight: 20
         - analysis:
             templates:
-              - templateName: frontend-canary-health
+              - templateName: frontend-canary-error-rate
         - setWeight: 50
         - pause: {}
         - setWeight: 100
